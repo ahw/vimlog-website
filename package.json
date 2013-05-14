@@ -1,0 +1,11 @@
+{
+  "name": "VimLoggerWebsite",
+  "description": "For viewing Vim Log stuff",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "~3.2.4",
+    "underscore": "~1.4.4",
+    "sprintf": "~0.1.1"
+  }
+}
