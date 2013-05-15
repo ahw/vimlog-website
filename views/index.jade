@@ -1,3 +1,7 @@
 extends layout
 block content
     h1 VimLog
+
+    each item in eventlist
+        - var width = 100 * (item.timeElapsed / 4298);
+        div(style="background-color:gray;width:#{width}%")= item.filename

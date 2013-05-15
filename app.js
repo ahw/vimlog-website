@@ -2,9 +2,10 @@ var FileSystem = require('fs');
 var HTTP = require('http');
 var HTTPS = require('https');
 var Express = require('express');
-var VimLogProcessor = require(__dirname + '/VimLogProcessor');
+var VimLogProcessor = require(__dirname + '/api/vim-log-processor');
 global._ = require('underscore');
-sprintf = require('sprintf').sprintf;
+global.sprintf = require('sprintf').sprintf;
+global.request = require('request');
 
 var app = Express();
 
@@ -21,7 +22,16 @@ HTTP.createServer(app).listen(4400);
 console.log('Starting server on port 4400');
 
 app.get('/', function(req, res) {
-    res.render('index');
+
+    request('http://localhost:4400/api/weekly', function(error, response, body) {
+        if (error) {
+            console.error(error.stack);
+            res.json(400, error);
+            return;
+        }
+
+        res.render('index', { eventlist : JSON.parse(body)});
+    });
 });
 
 app.get('/api/weekly', function(req, res) {
