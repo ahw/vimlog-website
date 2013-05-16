@@ -23,14 +23,21 @@ console.log('Starting server on port 4400');
 
 app.get('/', function(req, res) {
 
-    request('http://localhost:4400/api/weekly', function(error, response, body) {
+    var options = {
+        url : 'http://localhost:4400/api/weekly',
+        qs : {
+            blacklist : ['NO_FILE'].join(';')
+        },
+        json : true
+    };
+    request(options, function(error, response, data) {
         if (error) {
             console.error(error.stack);
             res.json(400, error);
             return;
         }
 
-        res.render('index', { eventlist : JSON.parse(body)});
+        res.render('index', { eventlist : data });
     });
 });
 
