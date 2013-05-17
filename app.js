@@ -1,11 +1,14 @@
-var FileSystem = require('fs');
-var HTTP = require('http');
-var HTTPS = require('https');
-var Express = require('express');
-var VimLogProcessor = require(__dirname + '/api/vim-log-processor');
 global._ = require('underscore');
 global.sprintf = require('sprintf').sprintf;
 global.request = require('request');
+global.CONFIG = require(__dirname + '/config');
+
+var FileSystem = require('fs');
+var HTTP = require('http');
+var HTTPS = require('https');
+var Assets = require(__dirname + '/middleware/assets');
+var Express = require('express');
+var VimLogProcessor = require(__dirname + '/api/vim-log-processor');
 
 var app = Express();
 
@@ -14,9 +17,11 @@ app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 
 // Middleware
-app.use(Express.static(__dirname + '/static'));
+var STATIC_DIR = __dirname + '/static';
+app.use(Express.static(STATIC_DIR));
 app.use(Express.bodyParser());
 app.use(Express.cookieParser());
+app.use(Assets);
 
 HTTP.createServer(app).listen(4400);
 console.log('Starting server on port 4400');
@@ -26,7 +31,7 @@ app.get('/', function(req, res) {
     var options = {
         url : 'http://localhost:4400/api/weekly',
         qs : {
-            blacklist : ['NO_FILE'].join(';')
+            blacklist : ['NO_FILE', 'NERD_tree_1', 'NERD_tree_2', 'NERD_tree_3'].join(';')
         },
         json : true
     };
