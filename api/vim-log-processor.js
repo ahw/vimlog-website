@@ -29,6 +29,12 @@ var isBlacklisted = function(member, blacklist) {
     }
 };
 
+var getStartTimestamp = function(division) {
+};
+
+var getEndTimestamp = function(division) {
+};
+
 var readVimLog = function(pathToLogFile, options, callback) {
 
     switch (arguments.length) {
@@ -72,12 +78,12 @@ var readVimLog = function(pathToLogFile, options, callback) {
                 var filename = matches[4];
 
                 if (!isWhitelisted(filename, options.whitelist)) {
-                    console.log('Filename ' + filename + ' is not whitelisted; ignoring');
+                    // console.log('Filename ' + filename + ' is not whitelisted; ignoring');
                     return;
                 }
 
                 if (isBlacklisted(filename, options.blacklist)) {
-                    console.log('Filename ' + filename + ' is blacklisted; ignoring');
+                    // console.log('Filename ' + filename + ' is blacklisted; ignoring');
                     return;
                 }
 

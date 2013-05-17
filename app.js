@@ -26,10 +26,11 @@ app.use(Assets);
 HTTP.createServer(app).listen(4400);
 console.log('Starting server on port 4400');
 
-app.get('/', function(req, res) {
+app.get('/:division?', function(req, res) {
 
+    var division = req.body.division || "";
     var options = {
-        url : 'http://localhost:4400/api/weekly',
+        url : 'http://localhost:4400/api/' + division, 
         qs : {
             blacklist : ['NO_FILE', 'NERD_tree_1', 'NERD_tree_2', 'NERD_tree_3'].join(';')
         },
@@ -46,7 +47,7 @@ app.get('/', function(req, res) {
     });
 });
 
-app.get('/api/weekly', function(req, res) {
+app.get('/api/:division?', function(req, res) {
 
     var options = {};
     if (req.query.whitelist) {
@@ -55,6 +56,8 @@ app.get('/api/weekly', function(req, res) {
     if (req.query.blacklist) {
         options.blacklist = req.query.blacklist.split(';');
     }
+
+    options.division = req.body.division;
 
     console.log('Processing log file with options:', options);
     VimLogProcessor.readVimLog('/tmp/vimlog.log', options, function(error, data) {
