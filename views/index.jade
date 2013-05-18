@@ -3,5 +3,5 @@ block content
     h1 VimLog
 
     each item in eventlist
-        - var width = 100 * (item.timeElapsed / 4298);
+        - var width = 100 * (item.duration.seconds / 4298);
         div(style="color:black;padding-left:4px;margin-top:4px;font-size:10pt;font-family:Monospace,monospace;white-space:nowrap;background-color:gray;width:#{width}%")= item.filename

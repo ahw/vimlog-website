@@ -1,6 +1,7 @@
 global._ = require('underscore');
 global.sprintf = require('sprintf').sprintf;
 global.request = require('request');
+global.moment = require('moment');
 global.CONFIG = require(__dirname + '/config');
 
 var FileSystem = require('fs');
@@ -26,9 +27,35 @@ app.use(Assets);
 HTTP.createServer(app).listen(4400);
 console.log('Starting server on port 4400');
 
+app.get('/api/:division?', function(req, res) {
+
+    var options = {};
+    if (req.query.whitelist) {
+        options.whitelist = req.query.whitelist.split(';');
+    }
+    if (req.query.blacklist) {
+        options.blacklist = req.query.blacklist.split(';');
+    }
+
+    options.division = req.params.division;
+
+    console.log('Processing log file with options:', options);
+    VimLogProcessor.readVimLog('/tmp/vimlog.log', options, function(error, data) {
+        if (error) {
+            throw error;
+            return;
+        }
+        res.json(data);
+    });
+});
+
+app.get('/favicon.ico', function(req, res) {
+    res.send(404, 'Not found');
+});
+
 app.get('/:division?', function(req, res) {
 
-    var division = req.body.division || "";
+    var division = req.params.division || "";
     var options = {
         url : 'http://localhost:4400/api/' + division, 
         qs : {
@@ -43,29 +70,7 @@ app.get('/:division?', function(req, res) {
             return;
         }
 
+        console.log("Rendering index");
         res.render('index', { eventlist : data });
     });
-});
-
-app.get('/api/:division?', function(req, res) {
-
-    var options = {};
-    if (req.query.whitelist) {
-        options.whitelist = req.query.whitelist.split(';');
-    }
-    if (req.query.blacklist) {
-        options.blacklist = req.query.blacklist.split(';');
-    }
-
-    options.division = req.body.division;
-
-    console.log('Processing log file with options:', options);
-    VimLogProcessor.readVimLog('/tmp/vimlog.log', options, function(error, data) {
-        if (error) {
-            throw error;
-            return;
-        }
-        res.json(data);
-    });
-
 });

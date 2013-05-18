@@ -73,7 +73,7 @@ var readVimLog = function(pathToLogFile, options, callback) {
             matches = line.match(logLineRegExp);
             if (matches && matches.length == 5) {
                 var timestamp = matches[1];
-                var formattedDate = matches[2];
+                var humanDate = matches[2];
                 var eventName = matches[3];
                 var filename = matches[4];
 
@@ -93,7 +93,7 @@ var readVimLog = function(pathToLogFile, options, callback) {
                     filenames[filename].state = 'closed';
                     filenames[filename].filename = filename;
                     filenames[filename].lastTouched = {};
-                    filenames[filename].timeElapsed = -1;
+                    filenames[filename].duration = {};
                 }
 
                 filenames[filename].count += 1;
@@ -103,11 +103,11 @@ var readVimLog = function(pathToLogFile, options, callback) {
                         if (eventName === eventNames.VimEnter) {
                             filenames[filename].state = states.OPEN;
                             filenames[filename].lastTouched.seconds = timestamp;
-                            filenames[filename].lastTouched.formatted = formattedDate;
+                            filenames[filename].lastTouched.human = humanDate;
                         } else if (eventName === eventNames.BufEnter) {
                             filenames[filename].state = states.OPEN;
                             filenames[filename].lastTouched.seconds = timestamp;
-                            filenames[filename].lastTouched.formatted = formattedDate;
+                            filenames[filename].lastTouched.human = humanDate;
                         } else if (eventName === eventNames.VimLeave) {
                             // Nothing.
                         } else if (eventName === eventNames.BufLeave) {
@@ -124,14 +124,16 @@ var readVimLog = function(pathToLogFile, options, callback) {
                             // Nothing.
                         } else if (eventName === eventNames.VimLeave) {
                             filenames[filename].state = states.CLOSED;
-                            var elapsedTime = timestamp - filenames[filename].lastTouched.seconds;
-                            filenames[filename].timeElapsed = elapsedTime;
+                            var seconds = timestamp - filenames[filename].lastTouched.seconds;
+                            filenames[filename].duration.seconds = seconds;
+                            filenames[filename].duration.human = moment.duration(seconds, 'seconds').humanize();
                         } else if (eventName === eventNames.BufLeave) {
                             filenames[filename].state = states.CLOSED;
-                            var elapsedTime = timestamp - filenames[filename].lastTouched.seconds;
-                            filenames[filename].timeElapsed = elapsedTime;
+                            var seconds = timestamp - filenames[filename].lastTouched.seconds;
+                            filenames[filename].duration.seconds = seconds;
+                            filenames[filename].duration.human = moment.duration(seconds, 'seconds').humanize();
                         } else {
-                            callback(new Error('Unkonwn event name ' + eventName + ' in state ' + states.CLOSED));
+                            callback(new Error('Unknown event name ' + eventName + ' in state ' + states.CLOSED));
                         }
                         break;
 
@@ -150,7 +152,7 @@ var readVimLog = function(pathToLogFile, options, callback) {
         });
 
         sortedFilenames = _.sortBy(sortedFilenames, function(item) {
-            return -1 * item.timeElapsed;
+            return -1 * item.duration.seconds;
         });
 
         console.log('Making callback with sorted filenames');
