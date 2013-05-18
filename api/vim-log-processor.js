@@ -76,6 +76,7 @@ var readVimLog = function(pathToLogFile, options, callback) {
                 var humanDate = matches[2];
                 var eventName = matches[3];
                 var filename = matches[4];
+                var currentTimestamp = moment().unix();
 
                 if (!isWhitelisted(filename, options.whitelist)) {
                     // console.log('Filename ' + filename + ' is not whitelisted; ignoring');
@@ -104,10 +105,12 @@ var readVimLog = function(pathToLogFile, options, callback) {
                             filenames[filename].state = states.OPEN;
                             filenames[filename].lastTouched.seconds = timestamp;
                             filenames[filename].lastTouched.human = humanDate;
+                            filenames[filename].lastTouched.tillNow = currentTimestamp - timestamp;
                         } else if (eventName === eventNames.BufEnter) {
                             filenames[filename].state = states.OPEN;
                             filenames[filename].lastTouched.seconds = timestamp;
                             filenames[filename].lastTouched.human = humanDate;
+                            filenames[filename].lastTouched.tillNow = currentTimestamp - timestamp;
                         } else if (eventName === eventNames.VimLeave) {
                             // Nothing.
                         } else if (eventName === eventNames.BufLeave) {
